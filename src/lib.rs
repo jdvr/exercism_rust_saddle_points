@@ -8,11 +8,16 @@ struct Point {
 }
 
 pub fn find_saddle_points(input: &[Vec<u64>]) -> Vec<(usize, usize)> {
+    let size: usize = input.iter().map(|v| v.len()).sum();
+    if size  == 0 {
+        return vec![];
+    }
+
+    saddle_points(row_maxs(input), col_mins(input))
+}
+
+fn row_maxs(input: &[Vec<u64>]) -> Vec<Point> {
     let mut points_by_rows: Vec<Point> = Vec::new();
-    let mut points_by_columns: Vec<Point> = Vec::new();
-    let mut result: Vec<(usize, usize)> = Vec::new();
-
-
     for row_number in 0..input.len(){
         let mut row_max = input[row_number][0];
         let mut points_by_row: Vec<Point> = Vec::new();
@@ -26,7 +31,12 @@ pub fn find_saddle_points(input: &[Vec<u64>]) -> Vec<(usize, usize)> {
         println!("{:?}", points_by_row);
         points_by_rows.append(&mut points_by_row);
     }
+    points_by_rows
+}
 
+
+fn col_mins(input: &[Vec<u64>]) -> Vec<Point> {
+    let mut points_by_columns: Vec<Point> = Vec::new();
     for col_number in 0..input[0].len(){
         let mut col_min = u64::max_value();
         let mut points_by_column: Vec<Point> = Vec::new();
@@ -39,11 +49,9 @@ pub fn find_saddle_points(input: &[Vec<u64>]) -> Vec<(usize, usize)> {
         }
         points_by_columns.append(&mut points_by_column);
     }
+    points_by_columns
+}
 
-    for point in points_by_rows {
-        if points_by_columns.contains(&point) {
-            result.push((point.x, point.y))
-        }
-    }
-    result
+fn saddle_points(row_points: Vec<Point>, column_points: Vec<Point>) -> Vec<(usize, usize)> {
+    row_points.iter().filter(|p|  column_points.contains(&p)).map(|p| (p.x, p.y)).collect()
 }
